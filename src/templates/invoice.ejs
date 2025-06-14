@@ -352,34 +352,48 @@
         <% } %>
         
         <!-- Terms and Payment Information -->
-        <div class="terms-section">
-            <div>
-                <h2 class="section-title">Payment Terms:</h2>
-                <div class="info-box">
-                    <%= invoiceData.terms %>
+        <% if (invoiceData.terms && invoiceData.terms.trim() !== '' || 
+              invoiceData.paymentMethods && invoiceData.paymentMethods.trim() !== '' || 
+              invoiceData.lateFees && invoiceData.lateFees.trim() !== '' || 
+              invoiceData.disputeProcess && invoiceData.disputeProcess.trim() !== '') { %>
+            <div class="terms-section">
+                <% if (invoiceData.terms && invoiceData.terms.trim() !== '') { %>
+                <div>
+                    <h2 class="section-title">Payment Terms:</h2>
+                    <div class="info-box">
+                        <%= invoiceData.terms %>
+                    </div>
                 </div>
-            </div>
-            
-            <div>
-                <h2 class="section-title">Payment Methods:</h2>
-                <div class="info-box">
-                    <%= invoiceData.paymentMethods %>
+                <% } %>
+                
+                <% if (invoiceData.paymentMethods && invoiceData.paymentMethods.trim() !== '') { %>
+                <div>
+                    <h2 class="section-title">Payment Methods:</h2>
+                    <div class="info-box">
+                        <%= invoiceData.paymentMethods %>
+                    </div>
                 </div>
-            </div>
-            
-            <div>
-                <h2 class="section-title">Late Fee Policy:</h2>
-                <div class="info-box">
-                    <%= invoiceData.lateFees %>
+                <% } %>
+                
+                <% if (invoiceData.lateFees && invoiceData.lateFees.trim() !== '') { %>
+                <div>
+                    <h2 class="section-title">Late Fee Policy:</h2>
+                    <div class="info-box">
+                        <%= invoiceData.lateFees %>
+                    </div>
                 </div>
-            </div>
-            
-            <div>
-                <h2 class="section-title">Dispute Resolution:</h2>
-                <div class="info-box">
-                    <%= invoiceData.disputeProcess %>
+                <% } %>
+                
+                <% if (invoiceData.disputeProcess && invoiceData.disputeProcess.trim() !== '') { %>
+                <div>
+                    <h2 class="section-title">Dispute Resolution:</h2>
+                    <div class="info-box">
+                        <%= invoiceData.disputeProcess %>
+                    </div>
                 </div>
+                <% } %>
             </div>
+        <% } %>
         </div>
         
         <!-- Footer -->
