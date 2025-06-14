@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase Order <%= poData.poNumber %></title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #333;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .po-container {
+            padding: 30px;
+            max-width: 800px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .header .company-details {
+            text-align: right;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #2d3748;
+            margin: 0;
+        }
+        .header .po-number {
+            font-size: 14px;
+            color: #718096;
+        }
+        .address-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+        .address-section div { width: 48%; }
+        .address-section h3 {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .address-section p { margin: 0; line-height: 1.6; }
+        .po-info {
+            text-align: right;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .items-table th, .items-table td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #f7fafc;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+        .items-table .text-right { text-align: right; }
+        .items-table .text-center { text-align: center; }
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .totals-table {
+            width: 100%;
+            max-width: 300px;
+        }
+        .totals-table td {
+            padding: 8px 10px;
+        }
+        .totals-table .total-label { font-weight: 700; }
+        .totals-table .grand-total {
+            font-weight: 700;
+            font-size: 16px;
+            border-top: 2px solid #333;
+        }
+        .notes-section {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .notes-section h3 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            text-align: center;
+            font-size: 11px;
+            color: #718096;
+        }
+        .whitespace-pre-line { white-space: pre-line; }
+    </style>
+</head>
+<body>
+    <div class="po-container">
+        <div class="header">
+            <div>
+                <h1>PURCHASE ORDER</h1>
+                <p class="po-number">PO #: <%= poData.poNumber %></p>
+            </div>
+            <div class="company-details">
+                <h2><%= poData.companyInfo.name %></h2>
+                <p class="whitespace-pre-line"><%= poData.companyInfo.address %></p>
+            </div>
+        </div>
+
+        <div class="address-section">
+            <div>
+                <h3>VENDOR</h3>
+                <p><strong><%= poData.vendorInfo.name %></strong></p>
+                <p class="whitespace-pre-line"><%= poData.vendorInfo.address %></p>
+                <p><%= poData.vendorInfo.email %></p>
+            </div>
+            <div class="po-info">
+                <p><strong>Issue Date:</strong> <%= new Date(poData.issueDate).toLocaleDateString() %></p>
+                <p><strong>Delivery Date:</strong> <%= poData.deliveryDate ? new Date(poData.deliveryDate).toLocaleDateString() : 'N/A' %></p>
+            </div>
+        </div>
+
+        <div class="address-section">
+            <div>
+                <h3>SHIP TO</h3>
+                <p class="whitespace-pre-line"><%= poData.shippingAddress || poData.companyInfo.address %></p>
+            </div>
+            <div>
+                <h3>SHIPPING METHOD</h3>
+                <p><%= poData.shippingMethod || 'N/A' %></p>
+            </div>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th class="text-center">SKU</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% poData.items.forEach(item => { %>
+                    <tr>
+                        <td><%= item.description %></td>
+                        <td class="text-center"><%= item.sku || 'N/A' %></td>
+                        <td class="text-center"><%= item.quantity %></td>
+                        <td class="text-right">$<%= Number(item.unitPrice).toFixed(2) %></td>
+                        <td class="text-right">$<%= Number(item.totalPrice).toFixed(2) %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td>Subtotal</td>
+                    <td class="text-right">$<%= Number(poData.subtotal).toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Tax</td>
+                    <td class="text-right">$<%= Number(poData.taxAmount).toFixed(2) %></td>
+                </tr>
+                <tr>
+                    <td>Shipping</td>
+                    <td class="text-right">$<%= Number(poData.shippingCost).toFixed(2) %></td>
+                </tr>
+                <tr class="grand-total">
+                    <td class="total-label">Total</td>
+                    <td class="text-right">$<%= Number(poData.total).toFixed(2) %></td>
+                </tr>
+            </table>
+        </div>
+
+        <% if (poData.notes || poData.authorizedBy) { %>
+        <div class="notes-section">
+            <% if (poData.notes) { %>
+                <h3>Notes</h3>
+                <p class="whitespace-pre-line"><%= poData.notes %></p>
+            <% } %>
+            <% if (poData.authorizedBy) { %>
+                <p style="margin-top: 15px;"><strong>Authorized By:</strong> <%= poData.authorizedBy %></p>
+            <% } %>
+        </div>
+        <% } %>
+
+        <div class="footer">
+            <p>If you have any questions, please contact us at <%= poData.companyInfo.email %>.</p>
+            <p>Thank you for your business!</p>
+        </div>
+    </div>
+</body>
+</html>

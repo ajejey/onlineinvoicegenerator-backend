@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote #<%= quoteData.quoteNumber %></title>
+    <style>
+        :root {
+            --primary-color: #333333;
+            --secondary-color: #666666;
+            --accent-color: #4A5568; /* Professional dark gray-blue accent */
+            --background-color: #ffffff;
+            --highlight-color: #f9f9f9;
+            --border-color: #eeeeee;
+            --font-size-base: 11pt; /* Slightly smaller for potentially more text */
+            --font-size-header: 15pt;
+            --font-size-subheader: 13pt;
+            --line-height: 1.4;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: var(--font-size-base);
+            line-height: var(--line-height);
+            color: var(--primary-color);
+            background-color: var(--background-color);
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .quote-container {
+            padding: 0; /* Body padding will handle page margins */
+            border: 1px solid var(--border-color);
+            margin: 10mm auto;
+            background-color: white;
+            max-width: 210mm; /* A4 width */
+        }
+        
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px; /* Reduced margin */
+            padding-bottom: 15px; /* Reduced padding */
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .company-info {
+            max-width: 60%;
+        }
+        
+        .logo-container img {
+            max-height: 70px;
+            max-width: 220px;
+            margin-bottom: 10px;
+        }
+        
+        .quote-title-section {
+            text-align: right;
+        }
+
+        .quote-title {
+            font-size: 26pt;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        
+        .quote-details p {
+            margin-bottom: 3px;
+            font-size: 10pt;
+        }
+        
+        .section-title {
+            font-size: var(--font-size-subheader);
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+        
+        .client-company-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px; /* Reduced margin */
+            gap: 20px;
+        }
+        
+        .client-info, .company-details {
+            width: 48%;
+        }
+        
+        .info-box {
+            padding: 10px;
+            background-color: var(--highlight-color);
+            border-radius: 4px;
+            font-size: 10pt;
+            border: 1px solid var(--border-color);
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .items-table th {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 10pt;
+        }
+        
+        .items-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 10pt;
+        }
+        
+        .items-table .amount-cell {
+            text-align: right;
+        }
+        .items-table .quantity-cell, .items-table .rate-cell {
+            text-align: right;
+        }
+        
+        .totals-section {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .totals-table {
+            width: 45%;
+            font-size: 10pt;
+        }
+        
+        .totals-table td {
+            padding: 6px 0;
+        }
+        
+        .totals-table .label {
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .totals-table .value {
+            text-align: right;
+        }
+        
+        .total-row .label,
+        .total-row .value {
+            font-weight: 700;
+            font-size: 12pt;
+            color: var(--accent-color);
+            border-top: 2px solid var(--accent-color);
+            padding-top: 8px !important;
+        }
+        
+        .notes-terms-section {
+            margin-top: 25px; /* Reduced margin */
+            font-size: 9pt;
+            color: var(--secondary-color);
+        }
+        .notes-terms-section .info-box {
+            white-space: pre-wrap; /* Preserve line breaks in notes/terms */
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 9pt;
+            color: var(--secondary-color);
+            margin-top: 30px; /* Reduced margin */
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Dynamic classes based on pdfOptions from service */
+        .body-narrow { padding: 10mm; }
+        .body-wide { padding: 25mm; }
+        /* .body-default { padding: 15mm; } */
+        .body-default { padding: 0mm; }
+        .format-a3 .quote-container { max-width: 297mm; }
+        .format-letter .quote-container { max-width: 215.9mm; }
+        .format-legal .quote-container { max-width: 215.9mm; /* Height is 355.6mm */ }
+        .format-tabloid .quote-container { max-width: 279.4mm; /* Height is 431.8mm */ }
+
+        @media print {
+            body {
+                padding: 0;
+                margin: 0;
+                background-color: white; /* Ensure background is white for printing */
+            }
+            .quote-container {
+                border: none;
+                margin: 0;
+                box-shadow: none;
+                max-width: 100%; /* Ensure it uses full printable area */
+            }
+        }
+    </style>
+</head>
+<body class="<%= (pdfOptions && pdfOptions.margin && pdfOptions.margin.top === '10mm') ? 'body-narrow' : (pdfOptions && pdfOptions.margin && pdfOptions.margin.top === '25mm' ? 'body-wide' : 'body-default') %> <%= (pdfOptions && pdfOptions.format) ? 'format-' + pdfOptions.format.toLowerCase() : 'format-a4' %>">
+    <div class="quote-container">
+        <!-- Header -->
+        <div class="quote-header">
+            <div class="company-info">
+                <% if (quoteData.company.logo) { %>
+                <div class="logo-container">
+                    <img src="<%= quoteData.company.logo %>" alt="<%= quoteData.company.name %> Logo">
+                </div>
+                <% } %>
+                <h2><%= quoteData.company.name %></h2>
+                <p><%= quoteData.company.address %></p>
+                <p><%= quoteData.company.email %></p>
+                <p><%= quoteData.company.phone %></p>
+                <% if (quoteData.company.taxId) { %>
+                    <p>Tax ID: <%= quoteData.company.taxId %></p>
+                <% } %>
+            </div>
+            <div class="quote-title-section">
+                <h1 class="quote-title">QUOTE</h1>
+                <div class="quote-details">
+                    <p><strong>Quote Number:</strong> <%= quoteData.quoteNumber %></p>
+                    <p><strong>Date Issued:</strong> <%= formatDate(quoteData.date) %></p>
+                    <p><strong>Valid Until:</strong> <%= quoteData.validUntil ? formatDate(quoteData.validUntil) : 'N/A' %></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Client Information -->
+        <div class="client-company-section">
+            <div class="client-info">
+                <h3 class="section-title">Prepared For:</h3>
+                <div class="info-box">
+                    <p><strong><%= quoteData.client.name %></strong></p>
+                    <p><%= quoteData.client.address %></p>
+                    <p><%= quoteData.client.email %></p>
+                    <% if (quoteData.client.phone) { %><p><%= quoteData.client.phone %></p><% } %>
+                </div>
+            </div>
+            <!-- Optionally, add a section for your sales contact or prepared by -->
+        </div>
+        
+        <!-- Quote Items -->
+        <h3 class="section-title">Items & Services</h3>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Description</th>
+                    <th style="width: 15%;" class="quantity-cell">Quantity</th>
+                    <th style="width: 15%;" class="rate-cell">Rate</th>
+                    <th style="width: 20%;" class="amount-cell">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% quoteData.items.forEach(function(item) { %>
+                <tr>
+                    <td><%= item.description %></td>
+                    <td class="quantity-cell"><%= item.quantity %></td>
+                    <td class="rate-cell">$<%= formatCurrency(item.rate) %></td>
+                    <td class="amount-cell">$<%= formatCurrency(item.amount) %></td>
+                </tr>
+                <% }); %>
+                <% if (quoteData.items.length === 0) { %>
+                    <tr><td colspan="4" style="text-align:center; padding: 20px; color: var(--secondary-color);">No items included in this quote.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+        
+        <!-- Totals -->
+        <div class="totals-section">
+            <table class="totals-table">
+                <tr>
+                    <td class="label">Subtotal:</td>
+                    <td class="value">$<%= formatCurrency(quoteData.subtotal) %></td>
+                </tr>
+                <% if (quoteData.discountAmount && quoteData.discountAmount > 0) { %>
+                <tr>
+                    <td class="label">Discount <% if (quoteData.discountType === 'percentage' && quoteData.discountValue) { %>(<%= quoteData.discountValue %>%)<% } %>:</td>
+                    <td class="value" style="color: green;">-$<%= formatCurrency(quoteData.discountAmount) %></td>
+                </tr>
+                <% } %>
+                <!-- Tax can be added here if needed, or handled in notes -->
+                <tr class="total-row">
+                    <td class="label">Total:</td>
+                    <td class="value">$<%= formatCurrency(quoteData.total) %></td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Notes and Terms -->
+        <div class="notes-terms-section">
+            <% if (quoteData.notes && quoteData.notes.trim() !== '') { %>
+            <div>
+                <h3 class="section-title">Notes:</h3>
+                <div class="info-box">
+                    <p><%= quoteData.notes %></p>
+                </div>
+            </div>
+            <% } %>
+            
+            <% if (quoteData.terms && quoteData.terms.trim() !== '') { %>
+            <div>
+                <h3 class="section-title">Terms & Conditions:</h3>
+                <div class="info-box">
+                    <p><%= quoteData.terms %></p>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- Standard Quote Disclaimers -->
+            <div>
+                <h3 class="section-title">Important Information:</h3>
+                <div class="info-box">
+                    <p>This quote is valid until <%= quoteData.validUntil ? formatDate(quoteData.validUntil) : 'the date specified above' %>.</p>
+                    <p>Prices are subject to change after the validity period.</p>
+                    <p>This document is a quotation for the services/goods listed and does not constitute a binding contract until accepted by both parties.</p>
+                    <p>All prices are in USD unless otherwise stated. Applicable taxes may be added to the final invoice.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for considering <%= quoteData.company.name %>.</p>
+            <p>Generated on: <%= formatDate(new Date().toISOString().split('T')[0]) %></p>
+        </div>
+    </div>
+</body>
+</html>
